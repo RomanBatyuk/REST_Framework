@@ -8,7 +8,8 @@ Django_REST_Framework - тут происходит процесс обучен�
 
 1. Клонируйте репозиторий:
 ```
-https://github.com/RomanBatyuk/Django_REST_Framework```
+https://github.com/RomanBatyuk/Django_REST_Framework
+```
 2. Установите зависимости:
 ```
 pip install -r requirements.txt
