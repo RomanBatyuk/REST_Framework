@@ -6,8 +6,8 @@ from materials.models import Course, Lesson
 from django.core.exceptions import ValidationError
 
 
-###### Создан пользователь 1: ID 1, Email: user1@example.com
-###### Создан пользователь 2: ID 2, Email: user2@example.com
+###### Создан пользователь 1: ID 1, Email: user1@example.com, password='password123'
+###### Создан пользователь 2: ID 2, Email: user2@example.com, password='password456'
 
 
 class CustomUserManager(UserManager):
