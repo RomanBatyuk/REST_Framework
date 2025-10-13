@@ -2,7 +2,6 @@ from django.contrib.auth.models import AbstractUser, UserManager
 from django.db import models
 from django_countries.fields import CountryField
 from django.contrib.auth import get_user_model
-from materials.models import Course, Lesson
 from django.core.exceptions import ValidationError
 
 
@@ -62,7 +61,7 @@ class Payment(models.Model):
         help_text="Дата и время совершения оплаты"
     )
     paid_course = models.ForeignKey(
-        Course,
+        "materials.Course",
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
@@ -70,7 +69,7 @@ class Payment(models.Model):
         help_text="Курс, за который произведена оплата (если оплата за курс)"
     )
     paid_lesson = models.ForeignKey(
-        Lesson,
+        "materials.Lesson",
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
