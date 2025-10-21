@@ -1,6 +1,7 @@
+from drf_spectacular.utils import extend_schema_field
 from rest_framework.serializers import ModelSerializer
 from rest_framework import serializers
-from materials.models import Course, Lesson, Subscription
+from materials.models import Course, Lesson, Subscription, Course_purchase
 from materials.validators import validate_forbidden_reference
 
 
@@ -17,6 +18,7 @@ class CourseSerializer(ModelSerializer):
     lessons = LessonSerializer(many=True, read_only=True)
     is_subscribed = serializers.SerializerMethodField()
 
+    @extend_schema_field(serializers.IntegerField)
     def get_lessons_count(self, course):
         return course.lessons.count()
 
@@ -24,6 +26,7 @@ class CourseSerializer(ModelSerializer):
         model = Course
         fields = ("id", "name", "description", "lessons_count", "is_subscribed", "owner", "lessons")
 
+    @extend_schema_field(serializers.BooleanField)
     def get_is_subscribed(self, obj):
         # Получаем текущего пользователя из контекста запроса
         request = self.context.get('request')
@@ -32,5 +35,8 @@ class CourseSerializer(ModelSerializer):
             return Subscription.objects.filter(user=request.user, course=obj).exists()
         return False  # Если пользователь не аутентифицирован
 
+class Course_purchaseSerializer(ModelSerializer):
 
-
+    class Meta:
+        model = Course_purchase
+        fields = "__all__"
