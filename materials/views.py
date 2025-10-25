@@ -1,4 +1,3 @@
-from drf_spectacular.utils import extend_schema
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.generics import ListAPIView, CreateAPIView, UpdateAPIView, RetrieveAPIView, DestroyAPIView
 from materials.models import Course, Lesson, Subscription, Course_purchase
@@ -11,6 +10,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
 from drf_spectacular.utils import extend_schema, extend_schema_view
+from materials.tasks import send_course_update_notification
 
 
 @extend_schema_view(
@@ -47,7 +47,8 @@ from drf_spectacular.utils import extend_schema, extend_schema_view
     ),
     update=extend_schema(
         summary="Обновить курс",
-        description="Обновляет существующий курс. Доступно модераторам или владельцу.",
+        description="Обновляет существующий курс. Доступно модераторам или владельцу. После обновления автоматически"
+                    "отправляются асинхронные email-уведомления подписчикам о изменениях материалов.",
         request=CourseSerializer,
         responses={
             200: CourseSerializer,
@@ -95,6 +96,22 @@ class CourseViewSet(ModelViewSet):
         paginated_queryset = self.paginate_queryset(queryset)
         serializer = CourseSerializer(paginated_queryset, many=True)
         return self.get_paginated_response(serializer.data)
+
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)  # Сохраняет изменения
+
+        # Асинхронно отправляем уведомления подписчикам после обновления
+        send_course_update_notification.delay(instance.id)
+
+        if getattr(instance, '_prefetched_objects_cache', None):
+            # Populate prefetched object cache after updating.
+            instance._prefetched_objects_cache = {}
+
+        return Response(serializer.data)
 
 class SubscriptionView(APIView):
     permission_classes = [IsAuthenticated]
