@@ -1,1 +1,12 @@
 STRIPE_API_KEY=Ваш апи ключ
+
+CELERY_BROKER_URL=Ваш путь для redis
+CELERY_RESULT_BACKEND=Ваш путь для redis
+
+EMAIL_HOST=Ваш хост для почты
+EMAIL_PORT=Ваш порт для почты
+EMAIL_USE_TLS=False
+EMAIL_USE_SSL=True
+EMAIL_HOST_USER=Ваша почта
+EMAIL_HOST_PASSWORD=Ваш пароль для рассылки
+SITE_URL=Путь к Вашему сайту
